@@ -1,6 +1,9 @@
 const express = require("express");
 const app = express();
-const { getTopics } = require("./controllers/nc-news-controlers");
+const {
+  getTopics,
+  getArticleById,
+} = require("./controllers/nc-news-controlers");
 const endpoints = require("./endpoints.json");
 
 // app.use(express.json()); // Only when we post
@@ -9,16 +12,29 @@ app.get("/api", (request, response) => {
   response.status(200).send({ endpoints: endpoints });
 });
 app.get("/api/topics", getTopics);
+app.get("/api/articles/:article_id", getArticleById);
 
 // Handle 404 errors
-app.use((req, res, next) => {
-  res.status(404).send({ error: "Route not found" });
+// app.use((req, res, next) => {
+//   res.status(404).send({ error: "Route not found" });
+// });
+app.use((err, request, response, next) => {
+  if (err.code === "23502" || err.code === "22P02") {
+    response.status(400).send({ msg: "Bad request" });
+  }
+  next(err);
+});
+
+app.use((err, request, response, next) => {
+  if (err.status && err.msg) {
+    response.status(err.status).send({ msg: err.msg });
+  }
+  next(err);
 });
 
 // General error handler for unexpected errors
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send({ error: "Internal server error" });
+app.use((err, request, response, next) => {
+  res.status(500).send({ msg: "Internal server error" });
 });
 
 module.exports = app;

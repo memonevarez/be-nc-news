@@ -1,4 +1,4 @@
-const { fetchTopics } = require("../models/nc-news-models");
+const { fetchTopics, fetchArticleById } = require("../models/nc-news-models");
 
 function getTopics(request, response) {
   fetchTopics()
@@ -10,4 +10,16 @@ function getTopics(request, response) {
     });
 }
 
-module.exports = { getTopics };
+function getArticleById(request, response, next) {
+  const { article_id } = request.params;
+  fetchArticleById(article_id)
+    .then((article) => {
+      response.status(200).send({ article });
+    })
+    .catch((err) => {
+      //console.log(err, "In the controller");
+      next(err);
+    });
+}
+
+module.exports = { getTopics, getArticleById };

@@ -42,4 +42,41 @@ describe("ncNews API tests", () => {
         expect(endpointsResponse).toEqual(endpoints);
       });
   });
+  test("GET: 200 - /api/articles/:article_id - Returns all the columns of an article with the given id", () => {
+    return request(app)
+      .get("/api/articles/4")
+      .expect(200)
+      .then(({ body }) => {
+        const article = body.article;
+        expect(article).toEqual({
+          article_id: 4,
+          title: "Student SUES Mitch!",
+          topic: "mitch",
+          author: "rogersop",
+          body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
+          created_at: "2020-05-06T01:14:00.000Z",
+          votes: 0,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+  test("GET: 404 - /api/articles/:article_id - Test an article_id that doesnt exist", () => {
+    return request(app)
+      .get("/api/articles/99")
+      .expect(404)
+      .then(({ body }) => {
+        const errMsg = body.msg;
+        expect(errMsg).toBe("The article_id provided does not exist");
+      });
+  });
+  test("GET: 400 - /api/articles/:article_id - Test an article_id that is not a number", () => {
+    return request(app)
+      .get("/api/articles/99typo")
+      .expect(400)
+      .then(({ body }) => {
+        const errMsg = body.msg;
+        expect(errMsg).toBe("Bad request");
+      });
+  });
 });
