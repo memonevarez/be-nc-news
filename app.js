@@ -1,9 +1,13 @@
 const express = require("express");
 const app = express();
 const { getTopics } = require("./controllers/nc-news-controlers");
+const endpoints = require("./endpoints.json");
 
 // app.use(express.json()); // Only when we post
 
+app.get("/api", (request, response) => {
+  response.status(200).send({ endpoints: endpoints });
+});
 app.get("/api/topics", getTopics);
 
 // Handle 404 errors
