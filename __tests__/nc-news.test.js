@@ -79,4 +79,15 @@ describe("ncNews API tests", () => {
         expect(errMsg).toBe("Bad request");
       });
   });
+  test("GET: 200 - /api/articles - Returns all the articles sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles;
+        expect(articles[0].article_id).toBe(3);
+        expect(articles[0].comment_count).toBe(2);
+        expect(articles).toHaveLength(13);
+      });
+  });
 });

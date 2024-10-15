@@ -1,4 +1,8 @@
-const { fetchTopics, fetchArticleById } = require("../models/nc-news-models");
+const {
+  fetchTopics,
+  fetchArticleById,
+  fetchArticles,
+} = require("../models/nc-news-models");
 
 function getTopics(request, response) {
   fetchTopics()
@@ -22,4 +26,14 @@ function getArticleById(request, response, next) {
     });
 }
 
-module.exports = { getTopics, getArticleById };
+function getArticles(request, response, next) {
+  fetchArticles()
+    .then((articles) => {
+      response.status(200).send({ articles });
+    })
+    .catch((err) => {
+      next(err);
+    });
+}
+
+module.exports = { getTopics, getArticleById, getArticles };
