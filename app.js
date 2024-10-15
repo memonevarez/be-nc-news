@@ -4,6 +4,7 @@ const {
   getTopics,
   getArticleById,
   getArticles,
+  getCommentsByArticleId,
 } = require("./controllers/nc-news-controlers");
 const endpoints = require("./endpoints.json");
 
@@ -15,6 +16,7 @@ app.get("/api", (request, response) => {
 app.get("/api/topics", getTopics);
 app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/articles", getArticles);
+app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 
 // Handle 404 errors
 // app.use((req, res, next) => {
