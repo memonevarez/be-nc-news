@@ -3,6 +3,7 @@ const app = express();
 const {
   getTopics,
   getArticleById,
+  getArticles,
 } = require("./controllers/nc-news-controlers");
 const endpoints = require("./endpoints.json");
 
@@ -13,6 +14,7 @@ app.get("/api", (request, response) => {
 });
 app.get("/api/topics", getTopics);
 app.get("/api/articles/:article_id", getArticleById);
+app.get("/api/articles", getArticles);
 
 // Handle 404 errors
 // app.use((req, res, next) => {
