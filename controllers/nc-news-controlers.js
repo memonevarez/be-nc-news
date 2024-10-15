@@ -3,6 +3,7 @@ const {
   fetchArticleById,
   fetchArticles,
   fetchCommentsByArticleById,
+  addCommentByArticleById,
 } = require("../models/nc-news-models");
 
 function getTopics(request, response) {
@@ -59,7 +60,28 @@ function getCommentsByArticleId(request, response, next) {
       }
     })
     .catch((err) => {
-      console.log(err, "In the controller");
+      next(err);
+    });
+}
+
+function postCommentByArticleId(request, response, next) {
+  const { article_id } = request.params;
+  const commentData = request.body;
+  fetchArticleById(article_id)
+    .then((article) => {
+      if (article.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: `The article_id provided does not exist`,
+        });
+      } else {
+        return addCommentByArticleById(article_id, commentData);
+      }
+    })
+    .then((comment) => {
+      response.status(201).send({ comment });
+    })
+    .catch((err) => {
       next(err);
     });
 }
@@ -69,4 +91,5 @@ module.exports = {
   getArticleById,
   getArticles,
   getCommentsByArticleId,
+  postCommentByArticleId,
 };

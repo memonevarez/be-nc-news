@@ -133,4 +133,20 @@ describe("ncNews API tests", () => {
         expect(comments).toBe("Bad request");
       });
   });
+  test("POST: 201 - /api/articles/:article_id/comments - Post a new comment to the given article_id", () => {
+    const newComment = {
+      username: "lurker",
+      body: "We might all sue that man for leaving us",
+    };
+    return request(app)
+      .post("/api/articles/4/comments")
+      .send(newComment)
+      .expect(201)
+      .then(({ body }) => {
+        const comment = body.comment;
+        expect(comment.comment_id).toBe(19);
+        expect(comment.author).toBe("lurker");
+        expect(comment.body).toBe("We might all sue that man for leaving us");
+      });
+  });
 });
