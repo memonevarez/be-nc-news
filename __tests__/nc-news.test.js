@@ -90,4 +90,47 @@ describe("ncNews API tests", () => {
         expect(articles).toHaveLength(13);
       });
   });
+  test("GET: 200 - /api/articles/:article_id/comments - Returns all the comments that belong to the given article_id", () => {
+    return request(app)
+      .get("/api/articles/5/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const comments = body.comments;
+        //2 comments, ordered by date, belonging to article 5
+        expect(comments.length).toBe(2);
+        expect(Date.parse(comments[0].created_at)).toBeGreaterThan(
+          Date.parse(comments[1].created_at)
+        );
+        comments.forEach((comment) => {
+          expect(comment.article_id).toBe(5);
+        });
+      });
+  });
+  test("GET: 200 - /api/articles/:article_id/comments - Test an article_id with no comments", () => {
+    return request(app)
+      .get("/api/articles/12/comments")
+      .expect(404)
+      .then(({ body }) => {
+        const comments = body.comments;
+        expect(comments).toBe("Article 12 does not have comments yet");
+      });
+  });
+  test("GET: 200 - /api/articles/:article_id/comments - Test an article_id that doesn't exist", () => {
+    return request(app)
+      .get("/api/articles/999/comments")
+      .expect(404)
+      .then(({ body }) => {
+        const comments = body.comments;
+        expect(comments).toBe("Article 999 does not have comments yet");
+      });
+  });
+  test("GET: 200 - /api/articles/:article_id/comments - Test an article_id that is not a number", () => {
+    return request(app)
+      .get("/api/articles/999BadNumber/comments")
+      .expect(400)
+      .then(({ body }) => {
+        const comments = body.msg;
+        expect(comments).toBe("Bad request");
+      });
+  });
 });
