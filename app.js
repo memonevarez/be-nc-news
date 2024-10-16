@@ -6,6 +6,7 @@ const {
   getArticles,
   getCommentsByArticleId,
   postCommentByArticleId,
+  patchArticleByArticleId,
 } = require("./controllers/nc-news-controlers");
 const endpoints = require("./endpoints.json");
 
@@ -19,9 +20,13 @@ app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 app.post("/api/articles/:article_id/comments", postCommentByArticleId);
+app.patch("/api/articles/:article_id", patchArticleByArticleId);
 
 app.use((err, request, response, next) => {
-  if (err.code === "23502" || err.code === "22P02") {
+  //23502:not_null_violation
+  //23503: foreign_key_violation - Key (author)=(Guillermo) is not present in table "users"
+  //22P02: invalid_text_representation - not-a-number cases
+  if (err.code === "23502" || err.code === "22P02" || err.code === "23503") {
     response.status(400).send({ msg: "Bad request" });
   }
   next(err);
