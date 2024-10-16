@@ -9,6 +9,7 @@ const {
   patchArticleByArticleId,
   deleteComment,
   getCommentById,
+  getUsers,
 } = require("./controllers/nc-news-controlers");
 const endpoints = require("./endpoints.json");
 
@@ -25,6 +26,7 @@ app.post("/api/articles/:article_id/comments", postCommentByArticleId);
 app.patch("/api/articles/:article_id", patchArticleByArticleId);
 app.get("/api/comments/:comment_id", getCommentById);
 app.delete("/api/comments/:comment_id", deleteComment);
+app.get("/api/users", getUsers);
 
 app.use((err, request, response, next) => {
   //23502:not_null_violation
