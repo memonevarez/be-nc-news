@@ -111,17 +111,17 @@ describe("ncNews API tests", () => {
       .get("/api/articles/12/comments")
       .expect(404)
       .then(({ body }) => {
-        const comments = body.comments;
-        expect(comments).toBe("Article 12 does not have comments yet");
+        const msg = body.msg;
+        expect(msg).toBe("Article 12 does not have comments yet");
       });
   });
-  test("GET: 404 - /api/articles/:article_id/comments - Test an article_id that doesn't exist", () => {
+  test("GET: 404 - /api/articles/:article_id/comments - Test an article_id that doesn't exist, therefore has no comments", () => {
     return request(app)
       .get("/api/articles/999/comments")
       .expect(404)
       .then(({ body }) => {
-        const comments = body.comments;
-        expect(comments).toBe("Article 999 does not have comments yet");
+        const msg = body.msg;
+        expect(msg).toBe("The article_id provided does not exist");
       });
   });
   test("GET: 400 - /api/articles/:article_id/comments - Test an article_id that is not a number", () => {
@@ -207,6 +207,23 @@ describe("ncNews API tests", () => {
       .then(({ body }) => {
         const updatedArticle = body.msg;
         expect(updatedArticle).toBe("The article_id provided does not exist");
+      });
+  });
+  test("DELETE: 204 - /api/comments/:comment_id - Delete a comment with the given comment_id", () => {
+    return request(app)
+      .delete("/api/comments/16")
+      .expect(204)
+      .then(() => {
+        // Nothing was sent, so I check the GET endpoint and expect 404-NotFound
+        return request(app).get("/api/comments/16").expect(404);
+      });
+  });
+  test("DELETE: 404 - /api/comments/:comment_id - try to Delete a comment, but comment_id does not exist", () => {
+    return request(app)
+      .delete("/api/comments/888")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Comment with id 888 does not exist.");
       });
   });
 });
