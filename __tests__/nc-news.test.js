@@ -106,7 +106,7 @@ describe("ncNews API tests", () => {
         });
       });
   });
-  test("GET: 200 - /api/articles/:article_id/comments - Test an article_id with no comments", () => {
+  test("GET: 404 - /api/articles/:article_id/comments - Test an article_id with no comments", () => {
     return request(app)
       .get("/api/articles/12/comments")
       .expect(404)
@@ -115,7 +115,7 @@ describe("ncNews API tests", () => {
         expect(comments).toBe("Article 12 does not have comments yet");
       });
   });
-  test("GET: 200 - /api/articles/:article_id/comments - Test an article_id that doesn't exist", () => {
+  test("GET: 404 - /api/articles/:article_id/comments - Test an article_id that doesn't exist", () => {
     return request(app)
       .get("/api/articles/999/comments")
       .expect(404)
@@ -124,7 +124,7 @@ describe("ncNews API tests", () => {
         expect(comments).toBe("Article 999 does not have comments yet");
       });
   });
-  test("GET: 200 - /api/articles/:article_id/comments - Test an article_id that is not a number", () => {
+  test("GET: 400 - /api/articles/:article_id/comments - Test an article_id that is not a number", () => {
     return request(app)
       .get("/api/articles/999BadNumber/comments")
       .expect(400)
@@ -147,6 +147,66 @@ describe("ncNews API tests", () => {
         expect(comment.comment_id).toBe(19);
         expect(comment.author).toBe("lurker");
         expect(comment.body).toBe("We might all sue that man for leaving us");
+      });
+  });
+  test("POST: 404 - /api/articles/:article_id/comments - try to Post a new comment to a article_id that does not exist", () => {
+    const newComment = {
+      username: "lurker",
+      body: "We might all sue that man for leaving us",
+    };
+    return request(app)
+      .post("/api/articles/99/comments")
+      .send(newComment)
+      .expect(404)
+      .then(({ body }) => {
+        const comment = body.msg;
+        expect(comment).toBe("The article_id provided does not exist");
+      });
+  });
+  test("POST: 400 - /api/articles/:article_id/comments - try to Post a new comment with a username that does not exist", () => {
+    const newComment = {
+      username: "Guillermo",
+      body: "The table comments references users(username) ugghhhh, so SQL will not like it",
+    };
+    return request(app)
+      .post("/api/articles/4/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        const comment = body.msg;
+        expect(comment).toBe("Bad request");
+      });
+  });
+  test("PATCH: 200 - /api/articles/:article_id - update the number of votes of an article with the given articule_id", () => {
+    const votesUpdate = { inc_votes: 89 };
+    return request(app)
+      .patch("/api/articles/12")
+      .send(votesUpdate)
+      .expect(200)
+      .then(({ body }) => {
+        const updatedArticle = body.updatedArticle;
+        expect(updatedArticle).toEqual({
+          article_id: 12,
+          title: "Moustache",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "Have you seen the size of that thing?",
+          created_at: "2020-10-11T11:24:00.000Z",
+          votes: 89,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+  test("PATCH: 404 - /api/articles/:article_id - try to update the number of votes but the given articule_id does not exist", () => {
+    const votesUpdate = { inc_votes: 89 };
+    return request(app)
+      .patch("/api/articles/777")
+      .send(votesUpdate)
+      .expect(404)
+      .then(({ body }) => {
+        const updatedArticle = body.msg;
+        expect(updatedArticle).toBe("The article_id provided does not exist");
       });
   });
 });

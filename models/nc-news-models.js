@@ -49,6 +49,9 @@ function fetchCommentsByArticleById(article_id) {
     .then(({ rows }) => {
       //No Promise.reject if rows.length === 0, because there can be articles wit no comments
       return rows;
+    })
+    .catch((err) => {
+      //console.log(err);
     });
 }
 
@@ -62,6 +65,29 @@ function addCommentByArticleById(article_id, commentData) {
     )
     .then(({ rows }) => {
       return rows[0];
+    })
+    .catch((err) => {
+      //console.log(err);
+      /// I had to Rethrow the error to be caught in the calling function
+      throw err;
+    });
+}
+
+function updateArticleByArticleId(article_id, artData, currVotes) {
+  const { inc_votes } = artData;
+  const updatedVotes = currVotes + inc_votes;
+  return db
+    .query(
+      `UPDATE articles SET votes = $1 WHERE article_id = $2 RETURNING *;`,
+      [updatedVotes, article_id]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    })
+    .catch((err) => {
+      console.log(err);
+      /// I had to Rethrow the error to be caught in the calling function
+      throw err;
     });
 }
 
@@ -71,4 +97,5 @@ module.exports = {
   fetchArticles,
   fetchCommentsByArticleById,
   addCommentByArticleById,
+  updateArticleByArticleId,
 };
