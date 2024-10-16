@@ -20,7 +20,7 @@ function fetchArticleById(article_id) {
     });
 }
 
-function fetchArticles(sort_by = "created_at", order = "DESC") {
+function fetchArticles(sort_by = "created_at", order = "DESC", topic) {
   order = order.toUpperCase();
   const validSort_byValues = [
     "title",
@@ -28,6 +28,7 @@ function fetchArticles(sort_by = "created_at", order = "DESC") {
     "author",
     "created_at",
     "votes",
+    "comment_count",
   ];
   const validOrderValues = ["ASC", "DESC"];
 
@@ -40,15 +41,22 @@ function fetchArticles(sort_by = "created_at", order = "DESC") {
 
   let selectString = `SELECT articles.author, title, articles.article_id, topic, articles.created_at, articles.votes,
   article_img_url, CAST(count(comments.body) AS INT) AS comment_count FROM articles 
-  LEFT JOIN comments ON comments.article_id = articles.article_id 
-  GROUP BY articles.author, title, articles.article_id, topic, articles.created_at, articles.votes,
+  LEFT JOIN comments ON comments.article_id = articles.article_id `;
+
+  const queryValues = [];
+  if (topic) {
+    selectString += ` WHERE topic = $1`;
+    queryValues.push(topic);
+  }
+  selectString += ` GROUP BY articles.author, title, articles.article_id, topic, articles.created_at, articles.votes,
   article_img_url`;
+
   if (sort_by) {
     selectString += ` ORDER BY ${sort_by} ${order}`;
   }
-  //console.log(selectString);
+
   return db
-    .query(selectString)
+    .query(selectString, queryValues)
     .then(({ rows }) => {
       if (!rows[0]) {
         //rows.length === 0
