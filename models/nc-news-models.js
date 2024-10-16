@@ -20,15 +20,35 @@ function fetchArticleById(article_id) {
     });
 }
 
-function fetchArticles() {
+function fetchArticles(sort_by = "created_at", order = "DESC") {
+  order = order.toUpperCase();
+  const validSort_byValues = [
+    "title",
+    "topic",
+    "author",
+    "created_at",
+    "votes",
+  ];
+  const validOrderValues = ["ASC", "DESC"];
+
+  if (
+    !validSort_byValues.includes(sort_by) ||
+    !validOrderValues.includes(order)
+  ) {
+    return Promise.reject({ status: 400, msg: "Sorting Error" });
+  }
+
+  let selectString = `SELECT articles.author, title, articles.article_id, topic, articles.created_at, articles.votes,
+  article_img_url, CAST(count(comments.body) AS INT) AS comment_count FROM articles 
+  LEFT JOIN comments ON comments.article_id = articles.article_id 
+  GROUP BY articles.author, title, articles.article_id, topic, articles.created_at, articles.votes,
+  article_img_url`;
+  if (sort_by) {
+    selectString += ` ORDER BY ${sort_by} ${order}`;
+  }
+  //console.log(selectString);
   return db
-    .query(
-      `select articles.author, title, articles.article_id, topic, articles.created_at, articles.votes,
-    article_img_url, CAST(count(comments.body) AS INT) AS comment_count from articles 
-    LEFT JOIN comments ON comments.article_id = articles.article_id 
-    GROUP BY articles.author, title, articles.article_id, topic, articles.created_at, articles.votes,
-    article_img_url order by articles.created_at DESC;`
-    )
+    .query(selectString)
     .then(({ rows }) => {
       if (!rows[0]) {
         //rows.length === 0
@@ -39,6 +59,9 @@ function fetchArticles() {
         });
       }
       return rows;
+    })
+    .catch((err) => {
+      console.log(err);
     });
 }
 

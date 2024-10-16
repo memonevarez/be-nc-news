@@ -90,6 +90,17 @@ describe("ncNews API tests", () => {
         expect(articles).toHaveLength(13);
       });
   });
+  test("GET: 200 - /api/articles - Returns all the articles sorted by votes in ASC order", () => {
+    return request(app)
+      .get("/api/articles?sort_by=votes&order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles;
+        expect(articles[0].votes).toBe(0);
+        expect(articles[12].votes).toBe(100);
+        expect(articles).toHaveLength(13);
+      });
+  });
   test("GET: 200 - /api/articles/:article_id/comments - Returns all the comments that belong to the given article_id", () => {
     return request(app)
       .get("/api/articles/5/comments")
