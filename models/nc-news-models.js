@@ -125,6 +125,18 @@ function removeComment(comment_id) {
     });
 }
 
+function fetchUsers() {
+  return db.query(`SELECT * FROM users;`).then(({ rows }) => {
+    if (!rows[0]) {
+      return Promise.reject({
+        status: 404,
+        msg: "There are no users yet",
+      });
+    }
+    return rows;
+  });
+}
+
 module.exports = {
   fetchTopics,
   fetchArticleById,
@@ -134,4 +146,5 @@ module.exports = {
   updateArticleByArticleId,
   removeComment,
   fetchCommentById,
+  fetchUsers,
 };

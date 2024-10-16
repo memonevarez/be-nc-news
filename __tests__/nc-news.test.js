@@ -226,4 +226,20 @@ describe("ncNews API tests", () => {
         expect(body.msg).toBe("Comment with id 888 does not exist.");
       });
   });
+  test("GET: 200 - /api/users - responds with an array containing all the users", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const users = body.users;
+        expect(users).toHaveLength(4);
+        users.forEach((user) => {
+          expect(Object.keys(user).toSorted()).toEqual([
+            "avatar_url",
+            "name",
+            "username",
+          ]);
+        });
+      });
+  });
 });
