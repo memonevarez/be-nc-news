@@ -8,7 +8,13 @@ function fetchTopics() {
 
 function fetchArticleById(article_id) {
   return db
-    .query(`SELECT * FROM articles WHERE article_id = $1;`, [article_id])
+    .query(
+      `SELECT articles.author, title, articles.article_id, articles.body, topic, articles.created_at, articles.votes,
+    article_img_url, CAST(count(comments.body) AS INT) AS comment_count FROM articles 
+    LEFT JOIN comments ON comments.article_id = articles.article_id 
+    WHERE articles.article_id = $1 GROUP BY articles.author, title, articles.article_id, articles.body, topic, articles.created_at, articles.votes, article_img_url;`,
+      [article_id]
+    )
     .then(({ rows }) => {
       if (!rows[0]) {
         return Promise.reject({
@@ -115,6 +121,13 @@ function addCommentByArticleById(article_id, commentData) {
 function updateArticleByArticleId(article_id, artData, currVotes) {
   const { inc_votes } = artData;
   const updatedVotes = currVotes + inc_votes;
+  if (typeof updatedVotes !== "number") {
+    return Promise.reject({
+      status: 400,
+      msg: `Not a valid number of votes`,
+    });
+  }
+
   return db
     .query(
       `UPDATE articles SET votes = $1 WHERE article_id = $2 RETURNING *;`,
