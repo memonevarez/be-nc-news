@@ -58,7 +58,17 @@ describe("ncNews API tests", () => {
           votes: 0,
           article_img_url:
             "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          comment_count: 0,
         });
+      });
+  });
+  test("GET: 200 - /api/articles/:article_id - Returns all the columns of an article with the given id, plus a comment_count column", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then(({ body }) => {
+        const article = body.article;
+        expect(article.comment_count).toBe(11);
       });
   });
   test("GET: 404 - /api/articles/:article_id - Test an article_id that doesnt exist", () => {
@@ -231,6 +241,28 @@ describe("ncNews API tests", () => {
         expect(updatedArticle).toBe("The article_id provided does not exist");
       });
   });
+  test("PATCH: 404 - /api/articles/:article_id - try to update the number of votes but the given articule_id is not-a-number", () => {
+    const votesUpdate = { inc_votes: 89 };
+    return request(app)
+      .patch("/api/articles/not-a-number")
+      .send(votesUpdate)
+      .expect(400)
+      .then(({ body }) => {
+        const updatedArticle = body.msg;
+        expect(updatedArticle).toBe("Bad request");
+      });
+  });
+  test("PATCH: 404 - /api/articles/:article_id - try to update the number of votes but the votes in the given object are not-a-number", () => {
+    const votesUpdate = { inc_votes: "bad-number" };
+    return request(app)
+      .patch("/api/articles/9")
+      .send(votesUpdate)
+      .expect(400)
+      .then(({ body }) => {
+        const updatedArticle = body.msg;
+        expect(updatedArticle).toBe("Not a valid number of votes");
+      });
+  });
   test("DELETE: 204 - /api/comments/:comment_id - Delete a comment with the given comment_id", () => {
     return request(app)
       .delete("/api/comments/16")
@@ -246,6 +278,14 @@ describe("ncNews API tests", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("Comment with id 888 does not exist.");
+      });
+  });
+  test("DELETE: 400 - /api/comments/:comment_id - try to Delete a comment, with an invalid comment_id ", () => {
+    return request(app)
+      .delete("/api/comments/not-a-numberrr")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
       });
   });
   test("GET: 200 - /api/users - responds with an array containing all the users", () => {
