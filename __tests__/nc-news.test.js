@@ -310,7 +310,6 @@ describe("ncNews API tests", () => {
       .expect(200)
       .then(({ body }) => {
         const user = body.user;
-        console.log(user);
         expect(user).toEqual({
           username: "butter_bridge",
           name: "jonny",
@@ -326,6 +325,51 @@ describe("ncNews API tests", () => {
       .then(({ body }) => {
         const user = body.msg;
         expect(user).toBe("The username Guillermo provided does not exist");
+      });
+  });
+  test("PATCH: 200 - /api/comments/:comment_id - update the number of votes of a comment with the given comment_id", () => {
+    const votesUpdate = { inc_votes: 1 };
+    return request(app)
+      .patch("/api/comments/14")
+      .send(votesUpdate)
+      .expect(200)
+      .then(({ body }) => {
+        const updatedComment = body.updatedComment;
+        expect(updatedComment.votes).toBe(17);
+        expect(updatedComment.comment_id).toBe(14);
+      });
+  });
+  test("PATCH: 404 - /api/comments/:comment_id - try to update the number of votes but the given articule_id does not exist", () => {
+    const votesUpdate = { inc_votes: 89 };
+    return request(app)
+      .patch("/api/comments/777")
+      .send(votesUpdate)
+      .expect(404)
+      .then(({ body }) => {
+        const updatedCommnet = body.msg;
+        expect(updatedCommnet).toBe("Comment with id 777 does not exist.");
+      });
+  });
+  test("PATCH: 404 - /api/comments/:comment_id - try to update the number of votes but the given articule_id is not-a-number", () => {
+    const votesUpdate = { inc_votes: 89 };
+    return request(app)
+      .patch("/api/comments/not-a-number")
+      .send(votesUpdate)
+      .expect(400)
+      .then(({ body }) => {
+        const updatedCommnet = body.msg;
+        expect(updatedCommnet).toBe("Bad request");
+      });
+  });
+  test("PATCH: 404 - /api/comments/:comment_id - try to update the number of votes but the votes in the given object are not-a-number", () => {
+    const votesUpdate = { inc_votes: "bad-number" };
+    return request(app)
+      .patch("/api/comments/9")
+      .send(votesUpdate)
+      .expect(400)
+      .then(({ body }) => {
+        const updatedCommnet = body.msg;
+        expect(updatedCommnet).toBe("Not a valid number of votes");
       });
   });
 });

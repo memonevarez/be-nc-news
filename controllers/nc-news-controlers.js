@@ -9,6 +9,7 @@ const {
   fetchCommentById,
   fetchUsers,
   fetchUserByUsername,
+  updateCommentVotesByCommentId,
 } = require("../models/nc-news-models");
 
 function getTopics(request, response) {
@@ -122,6 +123,25 @@ function deleteComment(request, response, next) {
     });
 }
 
+function patchCommentVotesByCommentId(request, response, next) {
+  const { comment_id } = request.params;
+  const { inc_votes } = request.body;
+  fetchCommentById(comment_id)
+    .then((comment) => {
+      return updateCommentVotesByCommentId(
+        comment_id,
+        inc_votes,
+        comment.votes
+      );
+    })
+    .then((updatedComment) => {
+      response.status(200).send({ updatedComment });
+    })
+    .catch((err) => {
+      next(err);
+    });
+}
+
 function getUsers(request, response, next) {
   fetchUsers()
     .then((users) => {
@@ -154,4 +174,5 @@ module.exports = {
   getCommentById,
   getUsers,
   getUserByUsername,
+  patchCommentVotesByCommentId,
 };
