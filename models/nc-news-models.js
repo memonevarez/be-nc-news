@@ -169,6 +169,28 @@ function removeComment(comment_id) {
     });
 }
 
+function updateCommentVotesByCommentId(comment_id, inc_votes, currVotes) {
+  const updatedVotes = currVotes + inc_votes;
+  if (typeof updatedVotes !== "number") {
+    return Promise.reject({
+      status: 400,
+      msg: `Not a valid number of votes`,
+    });
+  }
+
+  return db
+    .query(
+      `UPDATE comments SET votes = $1 WHERE comment_id = $2 RETURNING *;`,
+      [updatedVotes, comment_id]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
 function fetchUsers() {
   return db.query(`SELECT * FROM users;`).then(({ rows }) => {
     if (!rows[0]) {
@@ -206,4 +228,5 @@ module.exports = {
   fetchCommentById,
   fetchUsers,
   fetchUserByUsername,
+  updateCommentVotesByCommentId,
 };
