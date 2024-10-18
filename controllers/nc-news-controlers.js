@@ -8,6 +8,7 @@ const {
   removeComment,
   fetchCommentById,
   fetchUsers,
+  fetchUserByUsername,
 } = require("../models/nc-news-models");
 
 function getTopics(request, response) {
@@ -131,6 +132,17 @@ function getUsers(request, response, next) {
     });
 }
 
+function getUserByUsername(request, response, next) {
+  const { username } = request.params;
+  fetchUserByUsername(username)
+    .then((user) => {
+      response.status(200).send({ user });
+    })
+    .catch((err) => {
+      next(err);
+    });
+}
+
 module.exports = {
   getTopics,
   getArticleById,
@@ -141,4 +153,5 @@ module.exports = {
   deleteComment,
   getCommentById,
   getUsers,
+  getUserByUsername,
 };
