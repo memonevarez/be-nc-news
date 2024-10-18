@@ -304,4 +304,28 @@ describe("ncNews API tests", () => {
         });
       });
   });
+  test("GET: 200 - /api/users/:username - responds with an object containing the user with the given username", () => {
+    return request(app)
+      .get("/api/users/butter_bridge")
+      .expect(200)
+      .then(({ body }) => {
+        const user = body.user;
+        console.log(user);
+        expect(user).toEqual({
+          username: "butter_bridge",
+          name: "jonny",
+          avatar_url:
+            "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
+        });
+      });
+  });
+  test("GET: 200 - /api/users/:username - Try to get an user with an username that does nnot exist", () => {
+    return request(app)
+      .get("/api/users/Guillermo")
+      .expect(404)
+      .then(({ body }) => {
+        const user = body.msg;
+        expect(user).toBe("The username Guillermo provided does not exist");
+      });
+  });
 });

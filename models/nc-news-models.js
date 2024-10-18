@@ -181,6 +181,20 @@ function fetchUsers() {
   });
 }
 
+function fetchUserByUsername(username) {
+  return db
+    .query(`SELECT * FROM users WHERE username = $1;`, [username])
+    .then(({ rows }) => {
+      if (!rows[0]) {
+        return Promise.reject({
+          status: 404,
+          msg: `The username ${username} provided does not exist`,
+        });
+      }
+      return rows[0];
+    });
+}
+
 module.exports = {
   fetchTopics,
   fetchArticleById,
@@ -191,4 +205,5 @@ module.exports = {
   removeComment,
   fetchCommentById,
   fetchUsers,
+  fetchUserByUsername,
 };
