@@ -8,6 +8,7 @@ const {
   serverErrorHandler,
 } = require("./error-handlers/error-handlers");
 
+app.use(cors());
 app.use(express.json()); // Only when we post
 app.use("/api", apiRouter);
 app.use(psqlErrorHandler);
