@@ -2,7 +2,7 @@
 
 ## Hosted Version
 
-You can view the hosted version of this project here: [https://be-nc-news-r99v.onrender.com/api](https://be-nc-news-r99v.onrender.com/api/users)
+You can view the hosted version of this project here: [https://be-nc-news-r99v.onrender.com/api](https://be-nc-news-r99v.onrender.com/api)
 
 ## Project Summary
 
